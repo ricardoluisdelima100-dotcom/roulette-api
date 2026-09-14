@@ -1,91 +1,206 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Roulette Analyzer</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Roulette Analyzer Mobile</title>
 
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: Arial, sans-serif;
+      margin: 0;
+      min-height: 100vh;
       background: #111;
-      color: white;
+      color: #fff;
+      font-family: Arial, Helvetica, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 480px;
+      padding: 20px;
+    }
+
+    .titulo {
       text-align: center;
-      padding-top: 60px;
+      font-size: 26px;
+      font-weight: bold;
+      margin-top: 10px;
+      margin-bottom: 4px;
+    }
+
+    .subtitulo {
+      text-align: center;
+      color: #aaa;
+      font-size: 14px;
+      margin-bottom: 24px;
     }
 
     .card {
-      width: 320px;
-      margin: auto;
-      background: #1d1d1d;
-      padding: 30px;
-      border-radius: 14px;
+      background: #1c1c1c;
+      border-radius: 18px;
+      padding: 24px;
+      text-align: center;
+      box-shadow: 0 0 0 1px #2a2a2a;
     }
 
-    #numero {
-      font-size: 90px;
+    .rotulo {
+      font-size: 14px;
+      color: #aaa;
+      margin-bottom: 12px;
+    }
+
+    .numero {
+      width: 130px;
+      height: 130px;
+      margin: 0 auto 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 58px;
       font-weight: bold;
-      margin: 20px 0;
+      background: #2b2b2b;
     }
 
-    #status {
-      font-size: 22px;
+    .vermelho {
+      background: #b31313;
+    }
+
+    .preto {
+      background: #181818;
+      border: 2px solid #444;
+    }
+
+    .verde {
+      background: #0c7a34;
+    }
+
+    .horario {
+      font-size: 16px;
+      margin-top: 8px;
+      color: #ddd;
+    }
+
+    .status {
+      margin-top: 18px;
+      font-size: 15px;
       font-weight: bold;
     }
 
     .online {
-      color: #21d07a;
+      color: #31d36b;
     }
 
     .offline {
-      color: #ff4d4d;
+      color: #ff5d5d;
+    }
+
+    .atualizacao {
+      text-align: center;
+      margin-top: 18px;
+      font-size: 12px;
+      color: #777;
     }
   </style>
 </head>
 
 <body>
+  <div class="app">
+    <div class="titulo">Roulette Analyzer</div>
+    <div class="subtitulo">Mobile</div>
 
-  <div class="card">
-    <h2>ROULETTE ANALYZER</h2>
+    <div class="card">
+      <div class="rotulo">ÚLTIMO RESULTADO</div>
 
-    <div>ÚLTIMO RESULTADO</div>
+      <div id="numero" class="numero">--</div>
 
-    <div id="numero">--</div>
+      <div id="horario" class="horario">
+        Aguardando resultado...
+      </div>
 
-    <div id="horario">Horário: --</div>
+      <div id="status" class="status offline">
+        ● OFFLINE
+      </div>
+    </div>
 
-    <br>
-
-    <div id="status" class="offline">
-      🔴 OFFLINE
+    <div id="atualizacao" class="atualizacao">
+      Atualização automática
     </div>
   </div>
 
   <script>
+    const vermelhos = new Set([
+      1, 3, 5, 7, 9,
+      12, 14, 16, 18,
+      19, 21, 23, 25, 27,
+      30, 32, 34, 36
+    ]);
+
+    function classeNumero(numero) {
+      if (numero === 0) return "verde";
+      if (vermelhos.has(numero)) return "vermelho";
+      return "preto";
+    }
+
     async function atualizar() {
       try {
-        const resposta = await fetch("/estado");
-        const estado = await resposta.json();
+        const resposta = await fetch("/estado", {
+          cache: "no-store"
+        });
 
-        document.getElementById("numero").textContent =
-          estado.numero ?? "--";
-
-        document.getElementById("horario").textContent =
-          "Horário: " + (estado.horario ?? "--");
-
-        const status = document.getElementById("status");
-
-        if (estado.online) {
-          status.textContent = "🟢 ONLINE";
-          status.className = "online";
-        } else {
-          status.textContent = "🔴 OFFLINE";
-          status.className = "offline";
+        if (!resposta.ok) {
+          throw new Error("Falha ao consultar estado");
         }
 
+        const dados = await resposta.json();
+
+        const numeroEl = document.getElementById("numero");
+        const horarioEl = document.getElementById("horario");
+        const statusEl = document.getElementById("status");
+        const atualizacaoEl = document.getElementById("atualizacao");
+
+        if (
+          dados.numero === null ||
+          dados.numero === undefined
+        ) {
+          numeroEl.textContent = "--";
+          numeroEl.className = "numero";
+        } else {
+          const numero = Number(dados.numero);
+
+          numeroEl.textContent = numero;
+          numeroEl.className =
+            "numero " + classeNumero(numero);
+        }
+
+        horarioEl.textContent =
+          dados.horario
+            ? "Horário: " + dados.horario
+            : "Aguardando resultado...";
+
+        if (dados.online) {
+          statusEl.textContent = "● ONLINE";
+          statusEl.className = "status online";
+        } else {
+          statusEl.textContent = "● OFFLINE";
+          statusEl.className = "status offline";
+        }
+
+        atualizacaoEl.textContent =
+          "Atualizado às " +
+          new Date().toLocaleTimeString("pt-BR");
       } catch (erro) {
-        document.getElementById("status").textContent =
-          "🔴 OFFLINE";
+        const statusEl = document.getElementById("status");
+
+        statusEl.textContent = "● SEM CONEXÃO";
+        statusEl.className = "status offline";
       }
     }
 
@@ -93,6 +208,5 @@
 
     setInterval(atualizar, 1000);
   </script>
-
 </body>
 </html>
