@@ -22,7 +22,7 @@
 </head>
 <body>
 <div class="app">
- <div class="topo"><div class="titulo">ROULETTE ANALYZER <span class="versao">MOBILE</span></div><div class="subtitulo">Dados reais recebidos da v6.0.3</div></div>
+ <div class="topo"><div class="titulo">ROULETTE ANALYZER <span class="versao">MOBILE</span></div><div class="subtitulo">Dados reais recebidos da v6.0.4</div></div>
  <div class="secao"><div class="label">ÚLTIMO RESULTADO</div><div id="resultado" class="resultado">--</div><div id="historico" class="historico"></div></div>
  <div class="grid">
   <div class="card"><div class="nome">LEITOR DA MESA</div><div id="leitor" class="off">AGUARDANDO</div></div>
@@ -30,7 +30,12 @@
   <div class="card"><div class="nome">PONTE MOBILE</div><div id="ponte" class="off">AGUARDANDO</div></div>
   <div class="card"><div class="nome">SERVIDOR</div><div id="servidor" class="off">AGUARDANDO</div></div>
  </div>
- <div class="bloco"><div class="nome">CRUPIÊ / SINAIS / GREEN-RED / BANCA</div><div class="aviso">Ainda não enviados pela saída de leitura da v6.0.3. Nenhum dado fictício é mostrado.</div></div>
+ <div class="bloco"><div class="nome">CRUPIÊ ATUAL</div><div id="crupie" class="ok">AGUARDANDO</div></div>
+ <div class="grid" style="margin-top:7px">
+  <div class="card"><div class="nome">GREEN / RED</div><div id="greenred" class="ok">0 / 0</div></div>
+  <div class="card"><div class="nome">BANCA ATUAL</div><div id="banca" class="ok">--</div></div>
+ </div>
+ <div class="bloco"><div class="nome">SINAIS</div><div id="sinais" class="aviso">Aguardando sinais reais...</div></div>
  <div id="status" class="status off">● CONECTANDO</div>
  <div id="rodape" class="rodape">Aguardando...</div>
 </div>
@@ -47,6 +52,12 @@ async function atualizar(){
   const h=document.getElementById("historico");h.innerHTML="";
   (Array.isArray(d.historico)?d.historico:[]).slice(0,30).forEach(x=>{const b=document.createElement("div");b.className="bola "+cor(Number(x));b.textContent=x;h.appendChild(b)});
   st("leitor",!!d.diagnosticos?.leitor);st("extensao",!!d.diagnosticos?.extensao);st("ponte",!!d.diagnosticos?.ponte);st("servidor",true);
+  const m=d.mobile||{}, dealer=m.dealer||{}, fin=m.finance||{}, sig=m.signals||{};
+  const dc=dealer.current; document.getElementById("crupie").textContent=(dc&&typeof dc==="object"?(dc.nome||dc.name||dc.dealer||"AGUARDANDO"):dc)||"AGUARDANDO";
+  document.getElementById("greenred").textContent=String(fin.greens??0)+" / "+String(fin.reds??0);
+  const bv=Number(fin.bankrollEstimated);document.getElementById("banca").textContent=Number.isFinite(bv)?bv.toLocaleString("pt-BR",{style:"currency",currency:"BRL"}):"--";
+  const ativos=Array.isArray(sig.active)?sig.active:(sig.active&&typeof sig.active==="object"?Object.values(sig.active):[]); const lista=ativos.length?ativos:(Array.isArray(sig.list)?sig.list:[]);
+  document.getElementById("sinais").textContent=lista.length?lista.slice(0,5).map(x=>typeof x==="string"?x:(x?.nome||x?.name||x?.strategy||"Sinal ativo")).join(" • "):"Nenhum sinal ativo";
   const s=document.getElementById("status");s.textContent=d.online?"● ANALYZER ONLINE":"● ANALYZER OFFLINE";s.className=d.online?"status ok":"status off";
   document.getElementById("rodape").textContent=(d.horario?"Último giro: "+d.horario:"Aguardando resultado")+(d.seq!=null?" | seq "+d.seq:"");
  }catch(e){st("servidor",false);const s=document.getElementById("status");s.textContent="● SEM CONEXÃO";s.className="status off"}
