@@ -2,77 +2,78 @@ const express = require("express");
 const path = require("path");
 
 const app = express();
-
-// Na internet, o Render informa a porta.
-// No PC, continua usando 3000.
 const PORT = process.env.PORT || 3000;
 
-app.use(express.json());
-
-// Página visual
+app.use(express.json({ limit: "1mb" }));
 app.use(express.static(__dirname));
 
-// Estado atual da roleta
 let estado = {
   numero: null,
+  seq: null,
+  timestamp: null,
   horario: null,
   online: false,
-  atualizadoEm: null
+  historico: [],
+  diagnosticos: {
+    leitor: false,
+    extensao: false,
+    ponte: false
+  },
+  recebidoEm: null
 };
 
-// Teste da API
 app.get("/health", (req, res) => {
+  res.set("Cache-Control", "no-store");
+  res.json({ ok: true, service: "roulette-api", version: "0.2" });
+});
+
+app.get("/estado", (req, res) => {
+  res.set("Cache-Control", "no-store, no-cache, must-revalidate");
+  res.set("Pragma", "no-cache");
+
+  const recebidoEm = Number(estado.recebidoEm || 0);
+  const ativo = recebidoEm > 0 && Date.now() - recebidoEm < 15000;
+
   res.json({
-    ok: true,
-    servico: "roulette-api",
-    horarioServidor: new Date().toISOString()
+    ...estado,
+    online: Boolean(estado.online && ativo),
+    diagnosticos: {
+      ...estado.diagnosticos,
+      ponte: Boolean(estado.diagnosticos?.ponte && ativo)
+    }
   });
 });
 
-// Estado atual
-app.get("/estado", (req, res) => {
-  res.json(estado);
-});
-
-// Recebe resultado
 app.post("/resultado", (req, res) => {
-  const { numero, horario, online } = req.body;
+  const numero = Number(req.body?.numero);
 
-  if (
-    numero !== null &&
-    numero !== undefined &&
-    (!Number.isInteger(numero) || numero < 0 || numero > 36)
-  ) {
-    return res.status(400).json({
-      ok: false,
-      erro: "numero deve ser inteiro entre 0 e 36"
-    });
+  if (!Number.isInteger(numero) || numero < 0 || numero > 36) {
+    return res.status(400).json({ ok: false, error: "numero-invalido" });
   }
 
+  const historico = Array.isArray(req.body?.historico)
+    ? req.body.historico.map(Number).filter(n => Number.isInteger(n) && n >= 0 && n <= 36).slice(0, 100)
+    : [numero];
+
   estado = {
-    numero: numero ?? estado.numero,
-    horario: horario ?? new Date().toLocaleTimeString("pt-BR"),
-    online: online ?? true,
-    atualizadoEm: new Date().toISOString()
+    numero,
+    seq: Number.isFinite(Number(req.body?.seq)) ? Number(req.body.seq) : estado.seq,
+    timestamp: Number.isFinite(Number(req.body?.timestamp)) ? Number(req.body.timestamp) : Date.now(),
+    horario: String(req.body?.horario || new Date().toLocaleTimeString("pt-BR")),
+    online: req.body?.online !== false,
+    historico,
+    diagnosticos: {
+      leitor: Boolean(req.body?.diagnosticos?.leitor),
+      extensao: Boolean(req.body?.diagnosticos?.extensao),
+      ponte: true
+    },
+    recebidoEm: Date.now()
   };
 
-  res.json({
-    ok: true,
-    estado
-  });
+  res.json({ ok: true, numero: estado.numero, seq: estado.seq, historico: estado.historico.length });
 });
 
-// Garante abertura do index.html
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
-});
-
-app.listen(PORT, "0.0.0.0", () => {
-  console.log("");
-  console.log("======================================");
-  console.log("   ROULETTE ANALYZER API");
-  console.log("======================================");
+app.listen(PORT, () => {
+  console.log("ROULETTE ANALYZER API v0.2");
   console.log(`API rodando na porta ${PORT}`);
-  console.log("======================================");
-  console.log("");
 });
