@@ -1,212 +1,392 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Roulette Analyzer Mobile</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      min-height: 100vh;
-      background: #111;
-      color: #fff;
+      background: #06140f;
+      color: #f5f5f5;
       font-family: Arial, Helvetica, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
     }
 
     .app {
       width: 100%;
-      max-width: 480px;
-      padding: 20px;
+      max-width: 500px;
+      min-height: 100vh;
+      margin: auto;
+      padding: 10px;
+    }
+
+    .topo {
+      border-bottom: 1px solid #244237;
+      padding: 4px 2px 12px;
     }
 
     .titulo {
-      text-align: center;
-      font-size: 26px;
-      font-weight: bold;
-      margin-top: 10px;
-      margin-bottom: 4px;
+      font-size: 22px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .versao {
+      color: #20e6a1;
     }
 
     .subtitulo {
-      text-align: center;
-      color: #aaa;
-      font-size: 14px;
-      margin-bottom: 24px;
+      color: #aab7b1;
+      font-size: 12px;
+      margin-top: 4px;
     }
 
-    .card {
-      background: #1c1c1c;
-      border-radius: 18px;
-      padding: 24px;
-      text-align: center;
-      box-shadow: 0 0 0 1px #2a2a2a;
+    .secao {
+      margin-top: 12px;
     }
 
-    .rotulo {
-      font-size: 14px;
-      color: #aaa;
-      margin-bottom: 12px;
+    .label {
+      color: #aab7b1;
+      font-size: 11px;
+      text-transform: uppercase;
     }
 
-    .numero {
-      width: 130px;
-      height: 130px;
-      margin: 0 auto 18px;
+    .resultado {
+      font-size: 52px;
+      font-weight: 900;
+      line-height: 1;
+      margin: 4px 0 8px;
+    }
+
+    .resultado.vermelho { color: #ff2638; }
+    .resultado.preto { color: #ffffff; }
+    .resultado.verde { color: #19d982; }
+
+    .historico {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 3px 0 8px;
+      min-height: 34px;
+    }
+
+    .bola {
+      min-width: 27px;
+      height: 27px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 58px;
+      font-size: 12px;
       font-weight: bold;
-      background: #2b2b2b;
+      border: 1px solid #777;
+      background: #171717;
     }
 
-    .vermelho {
-      background: #b31313;
+    .bola.vermelho {
+      background: #df1f32;
+      border-color: #ff4d5d;
     }
 
-    .preto {
-      background: #181818;
-      border: 2px solid #444;
+    .bola.preto {
+      background: #151515;
     }
 
-    .verde {
-      background: #0c7a34;
+    .bola.verde {
+      background: #07965d;
+      border-color: #20e6a1;
     }
 
-    .horario {
-      font-size: 16px;
-      margin-top: 8px;
-      color: #ddd;
+    .diagnosticos {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-top: 10px;
     }
 
-    .status {
-      margin-top: 18px;
+    .diag {
+      border: 1px solid #245040;
+      border-radius: 8px;
+      padding: 8px;
+      background: #071b14;
+    }
+
+    .diag-nome {
+      color: #b8c2bd;
+      font-size: 11px;
+    }
+
+    .ok {
+      color: #18e69a;
       font-size: 15px;
       font-weight: bold;
     }
 
-    .online {
-      color: #31d36b;
+    .aguardando {
+      color: #e4b43d;
+      font-size: 13px;
+      font-weight: bold;
     }
 
-    .offline {
-      color: #ff5d5d;
+    .card {
+      border: 1px solid #315244;
+      border-radius: 10px;
+      background: #081b14;
+      padding: 10px;
+      margin-top: 10px;
     }
 
-    .atualizacao {
-      text-align: center;
-      margin-top: 18px;
+    .card-titulo {
+      color: #b8c2bd;
+      font-size: 11px;
+      font-weight: bold;
+    }
+
+    .destaque {
+      font-size: 23px;
+      font-weight: 900;
+      margin-top: 3px;
+    }
+
+    .linha {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 7px;
+    }
+
+    .chip {
+      border: 1px solid #5a6848;
+      border-radius: 7px;
+      padding: 5px 7px;
+      font-size: 11px;
+    }
+
+    .aviso {
+      margin-top: 8px;
+      border: 1px dashed #4c6258;
+      border-radius: 8px;
+      padding: 10px;
+      color: #8f9d97;
       font-size: 12px;
-      color: #777;
+    }
+
+    .status-mobile {
+      margin-top: 12px;
+      padding: 10px;
+      border-radius: 9px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: bold;
+      background: #09271c;
+      border: 1px solid #1a6046;
+    }
+
+    .online { color: #20e69b; }
+    .offline { color: #ff5967; }
+
+    .rodape {
+      color: #71817a;
+      text-align: center;
+      font-size: 10px;
+      padding: 14px 0 8px;
     }
   </style>
 </head>
 
 <body>
-  <div class="app">
-    <div class="titulo">Roulette Analyzer</div>
-    <div class="subtitulo">Mobile</div>
+<div class="app">
 
-    <div class="card">
-      <div class="rotulo">ÚLTIMO RESULTADO</div>
-
-      <div id="numero" class="numero">--</div>
-
-      <div id="horario" class="horario">
-        Aguardando resultado...
-      </div>
-
-      <div id="status" class="status offline">
-        ● OFFLINE
-      </div>
+  <div class="topo">
+    <div class="titulo">
+      ROULETTE ANALYZER <span class="versao">MOBILE</span>
     </div>
-
-    <div id="atualizacao" class="atualizacao">
-      Atualização automática
+    <div class="subtitulo">
+      Monitoramento remoto
     </div>
   </div>
 
-  <script>
-    const vermelhos = new Set([
-      1, 3, 5, 7, 9,
-      12, 14, 16, 18,
-      19, 21, 23, 25, 27,
-      30, 32, 34, 36
-    ]);
+  <div class="secao">
+    <div class="label">Último resultado</div>
+    <div id="resultado" class="resultado">--</div>
 
-    function classeNumero(numero) {
-      if (numero === 0) return "verde";
-      if (vermelhos.has(numero)) return "vermelho";
-      return "preto";
+    <div id="historico" class="historico"></div>
+  </div>
+
+  <div class="diagnosticos">
+    <div class="diag">
+      <div class="diag-nome">LEITOR</div>
+      <div class="aguardando">REMOTO</div>
+    </div>
+
+    <div class="diag">
+      <div class="diag-nome">EXTENSÃO</div>
+      <div class="aguardando">REMOTO</div>
+    </div>
+
+    <div class="diag">
+      <div class="diag-nome">LOCALHOST</div>
+      <div class="aguardando">REMOTO</div>
+    </div>
+
+    <div class="diag">
+      <div class="diag-nome">SINCRONIZAÇÃO</div>
+      <div id="syncStatus" class="aguardando">AGUARDANDO</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-titulo">CRUPIÊ ATUAL</div>
+    <div class="destaque">Aguardando integração</div>
+
+    <div class="linha">
+      <div class="chip">ENTROU: --:--:--</div>
+      <div class="chip">TEMPO NA MESA: --:--</div>
+    </div>
+
+    <div class="aviso">
+      Os dados do crupiê ainda não são enviados pela API Mobile.
+      Esta área será ativada na próxima etapa da integração.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-titulo">SINAIS / ESTRATÉGIAS</div>
+
+    <div class="aviso">
+      Aguardando integração dos sinais reais do Roulette Analyzer.
+      Nenhum sinal fictício é exibido.
+    </div>
+  </div>
+
+  <div id="mobileStatus" class="status-mobile offline">
+    ● CONECTANDO AO SERVIDOR
+  </div>
+
+  <div id="horario" class="rodape">
+    Aguardando resultado...
+  </div>
+
+</div>
+
+<script>
+  const vermelhos = new Set([
+    1,3,5,7,9,12,14,16,18,
+    19,21,23,25,27,30,32,34,36
+  ]);
+
+  let historicoLocal = [];
+  let ultimoNumero = null;
+  let ultimoHorario = null;
+
+  function cor(numero) {
+    if (numero === 0) return "verde";
+    if (vermelhos.has(numero)) return "vermelho";
+    return "preto";
+  }
+
+  function adicionarHistorico(numero, horario) {
+    const chave = String(numero) + "|" + String(horario);
+
+    if (chave === ultimoHorario) return;
+
+    ultimoHorario = chave;
+
+    historicoLocal.unshift(numero);
+
+    if (historicoLocal.length > 15) {
+      historicoLocal = historicoLocal.slice(0, 15);
     }
 
-    async function atualizar() {
-      try {
-        const resposta = await fetch("/estado", {
-          cache: "no-store"
-        });
+    desenharHistorico();
+  }
 
-        if (!resposta.ok) {
-          throw new Error("Falha ao consultar estado");
-        }
+  function desenharHistorico() {
+    const area = document.getElementById("historico");
+    area.innerHTML = "";
 
-        const dados = await resposta.json();
+    historicoLocal.forEach(numero => {
+      const bola = document.createElement("div");
+      bola.className = "bola " + cor(numero);
+      bola.textContent = numero;
+      area.appendChild(bola);
+    });
+  }
 
-        const numeroEl = document.getElementById("numero");
-        const horarioEl = document.getElementById("horario");
-        const statusEl = document.getElementById("status");
-        const atualizacaoEl = document.getElementById("atualizacao");
+  async function atualizar() {
+    const resultado = document.getElementById("resultado");
+    const mobileStatus = document.getElementById("mobileStatus");
+    const syncStatus = document.getElementById("syncStatus");
+    const horario = document.getElementById("horario");
+
+    try {
+      const resposta = await fetch("/estado?t=" + Date.now(), {
+        cache: "no-store"
+      });
+
+      if (!resposta.ok) {
+        throw new Error("Servidor indisponível");
+      }
+
+      const dados = await resposta.json();
+
+      if (
+        dados.numero !== null &&
+        dados.numero !== undefined
+      ) {
+        const numero = Number(dados.numero);
 
         if (
-          dados.numero === null ||
-          dados.numero === undefined
+          Number.isInteger(numero) &&
+          numero >= 0 &&
+          numero <= 36
         ) {
-          numeroEl.textContent = "--";
-          numeroEl.className = "numero";
-        } else {
-          const numero = Number(dados.numero);
+          resultado.textContent = numero;
+          resultado.className = "resultado " + cor(numero);
 
-          numeroEl.textContent = numero;
-          numeroEl.className =
-            "numero " + classeNumero(numero);
+          if (
+            numero !== ultimoNumero ||
+            dados.horario !== ultimoHorario
+          ) {
+            adicionarHistorico(numero, dados.horario);
+            ultimoNumero = numero;
+          }
         }
-
-        horarioEl.textContent =
-          dados.horario
-            ? "Horário: " + dados.horario
-            : "Aguardando resultado...";
-
-        if (dados.online) {
-          statusEl.textContent = "● ONLINE";
-          statusEl.className = "status online";
-        } else {
-          statusEl.textContent = "● OFFLINE";
-          statusEl.className = "status offline";
-        }
-
-        atualizacaoEl.textContent =
-          "Atualizado às " +
-          new Date().toLocaleTimeString("pt-BR");
-      } catch (erro) {
-        const statusEl = document.getElementById("status");
-
-        statusEl.textContent = "● SEM CONEXÃO";
-        statusEl.className = "status offline";
       }
+
+      if (dados.online) {
+        mobileStatus.textContent = "● SERVIDOR ONLINE";
+        mobileStatus.className = "status-mobile online";
+
+        syncStatus.textContent = "ONLINE";
+        syncStatus.className = "ok";
+      } else {
+        mobileStatus.textContent = "● ANALYZER OFFLINE";
+        mobileStatus.className = "status-mobile offline";
+
+        syncStatus.textContent = "OFFLINE";
+        syncStatus.className = "offline";
+      }
+
+      horario.textContent = dados.horario
+        ? "Último resultado recebido: " + dados.horario
+        : "Aguardando resultado...";
+
+    } catch (erro) {
+      mobileStatus.textContent = "● SEM CONEXÃO COM O SERVIDOR";
+      mobileStatus.className = "status-mobile offline";
+
+      syncStatus.textContent = "SEM CONEXÃO";
+      syncStatus.className = "offline";
     }
+  }
 
-    atualizar();
+  atualizar();
+  setInterval(atualizar, 1000);
+</script>
 
-    setInterval(atualizar, 1000);
-  </script>
 </body>
 </html>
