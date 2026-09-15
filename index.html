@@ -1,392 +1,57 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Roulette Analyzer Mobile</title>
-
-  <style>
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      background: #06140f;
-      color: #f5f5f5;
-      font-family: Arial, Helvetica, sans-serif;
-    }
-
-    .app {
-      width: 100%;
-      max-width: 500px;
-      min-height: 100vh;
-      margin: auto;
-      padding: 10px;
-    }
-
-    .topo {
-      border-bottom: 1px solid #244237;
-      padding: 4px 2px 12px;
-    }
-
-    .titulo {
-      font-size: 22px;
-      font-weight: 900;
-      line-height: 1;
-    }
-
-    .versao {
-      color: #20e6a1;
-    }
-
-    .subtitulo {
-      color: #aab7b1;
-      font-size: 12px;
-      margin-top: 4px;
-    }
-
-    .secao {
-      margin-top: 12px;
-    }
-
-    .label {
-      color: #aab7b1;
-      font-size: 11px;
-      text-transform: uppercase;
-    }
-
-    .resultado {
-      font-size: 52px;
-      font-weight: 900;
-      line-height: 1;
-      margin: 4px 0 8px;
-    }
-
-    .resultado.vermelho { color: #ff2638; }
-    .resultado.preto { color: #ffffff; }
-    .resultado.verde { color: #19d982; }
-
-    .historico {
-      display: flex;
-      gap: 6px;
-      overflow-x: auto;
-      padding: 3px 0 8px;
-      min-height: 34px;
-    }
-
-    .bola {
-      min-width: 27px;
-      height: 27px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-weight: bold;
-      border: 1px solid #777;
-      background: #171717;
-    }
-
-    .bola.vermelho {
-      background: #df1f32;
-      border-color: #ff4d5d;
-    }
-
-    .bola.preto {
-      background: #151515;
-    }
-
-    .bola.verde {
-      background: #07965d;
-      border-color: #20e6a1;
-    }
-
-    .diagnosticos {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px;
-      margin-top: 10px;
-    }
-
-    .diag {
-      border: 1px solid #245040;
-      border-radius: 8px;
-      padding: 8px;
-      background: #071b14;
-    }
-
-    .diag-nome {
-      color: #b8c2bd;
-      font-size: 11px;
-    }
-
-    .ok {
-      color: #18e69a;
-      font-size: 15px;
-      font-weight: bold;
-    }
-
-    .aguardando {
-      color: #e4b43d;
-      font-size: 13px;
-      font-weight: bold;
-    }
-
-    .card {
-      border: 1px solid #315244;
-      border-radius: 10px;
-      background: #081b14;
-      padding: 10px;
-      margin-top: 10px;
-    }
-
-    .card-titulo {
-      color: #b8c2bd;
-      font-size: 11px;
-      font-weight: bold;
-    }
-
-    .destaque {
-      font-size: 23px;
-      font-weight: 900;
-      margin-top: 3px;
-    }
-
-    .linha {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 7px;
-    }
-
-    .chip {
-      border: 1px solid #5a6848;
-      border-radius: 7px;
-      padding: 5px 7px;
-      font-size: 11px;
-    }
-
-    .aviso {
-      margin-top: 8px;
-      border: 1px dashed #4c6258;
-      border-radius: 8px;
-      padding: 10px;
-      color: #8f9d97;
-      font-size: 12px;
-    }
-
-    .status-mobile {
-      margin-top: 12px;
-      padding: 10px;
-      border-radius: 9px;
-      text-align: center;
-      font-size: 13px;
-      font-weight: bold;
-      background: #09271c;
-      border: 1px solid #1a6046;
-    }
-
-    .online { color: #20e69b; }
-    .offline { color: #ff5967; }
-
-    .rodape {
-      color: #71817a;
-      text-align: center;
-      font-size: 10px;
-      padding: 14px 0 8px;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Roulette Analyzer Mobile</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#06140f;color:#f5f5f5;font-family:Arial,Helvetica,sans-serif}
+.app{width:100%;max-width:520px;min-height:100vh;margin:auto;padding:12px}
+.topo{border-bottom:1px solid #244237;padding:4px 2px 12px}.titulo{font-size:22px;font-weight:900}.versao{color:#20e6a1}
+.subtitulo,.label{color:#aab7b1;font-size:12px}.secao{margin-top:14px}.resultado{font-size:58px;font-weight:900;line-height:1;margin:5px 0 10px}
+.vermelho{color:#ff2638}.preto{color:#fff}.verde{color:#19d982}
+.historico{display:flex;gap:6px;overflow-x:auto;padding:4px 0 10px}
+.bola{min-width:29px;height:29px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;border:1px solid #777;background:#151515;color:#fff}
+.bola.vermelho{background:#df1f32;border-color:#ff4d5d}.bola.verde{background:#07965d;border-color:#20e6a1}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.card{border:1px solid #315244;border-radius:9px;background:#081b14;padding:9px}
+.nome{color:#b8c2bd;font-size:11px}.ok{color:#18e69a;font-weight:bold;margin-top:3px}.off{color:#ff5967;font-weight:bold;margin-top:3px}
+.bloco{margin-top:10px;border:1px solid #315244;border-radius:10px;background:#081b14;padding:11px}
+.aviso{margin-top:7px;color:#8f9d97;font-size:12px}.status{text-align:center;margin-top:12px;padding:10px;border-radius:9px;border:1px solid #1a6046;background:#09271c;font-weight:bold}
+.rodape{text-align:center;color:#71817a;font-size:10px;padding:12px}
+</style>
 </head>
-
 <body>
 <div class="app">
-
-  <div class="topo">
-    <div class="titulo">
-      ROULETTE ANALYZER <span class="versao">MOBILE</span>
-    </div>
-    <div class="subtitulo">
-      Monitoramento remoto
-    </div>
-  </div>
-
-  <div class="secao">
-    <div class="label">Último resultado</div>
-    <div id="resultado" class="resultado">--</div>
-
-    <div id="historico" class="historico"></div>
-  </div>
-
-  <div class="diagnosticos">
-    <div class="diag">
-      <div class="diag-nome">LEITOR</div>
-      <div class="aguardando">REMOTO</div>
-    </div>
-
-    <div class="diag">
-      <div class="diag-nome">EXTENSÃO</div>
-      <div class="aguardando">REMOTO</div>
-    </div>
-
-    <div class="diag">
-      <div class="diag-nome">LOCALHOST</div>
-      <div class="aguardando">REMOTO</div>
-    </div>
-
-    <div class="diag">
-      <div class="diag-nome">SINCRONIZAÇÃO</div>
-      <div id="syncStatus" class="aguardando">AGUARDANDO</div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-titulo">CRUPIÊ ATUAL</div>
-    <div class="destaque">Aguardando integração</div>
-
-    <div class="linha">
-      <div class="chip">ENTROU: --:--:--</div>
-      <div class="chip">TEMPO NA MESA: --:--</div>
-    </div>
-
-    <div class="aviso">
-      Os dados do crupiê ainda não são enviados pela API Mobile.
-      Esta área será ativada na próxima etapa da integração.
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-titulo">SINAIS / ESTRATÉGIAS</div>
-
-    <div class="aviso">
-      Aguardando integração dos sinais reais do Roulette Analyzer.
-      Nenhum sinal fictício é exibido.
-    </div>
-  </div>
-
-  <div id="mobileStatus" class="status-mobile offline">
-    ● CONECTANDO AO SERVIDOR
-  </div>
-
-  <div id="horario" class="rodape">
-    Aguardando resultado...
-  </div>
-
+ <div class="topo"><div class="titulo">ROULETTE ANALYZER <span class="versao">MOBILE</span></div><div class="subtitulo">Dados reais recebidos da v6.0.3</div></div>
+ <div class="secao"><div class="label">ÚLTIMO RESULTADO</div><div id="resultado" class="resultado">--</div><div id="historico" class="historico"></div></div>
+ <div class="grid">
+  <div class="card"><div class="nome">LEITOR DA MESA</div><div id="leitor" class="off">AGUARDANDO</div></div>
+  <div class="card"><div class="nome">EXTENSÃO</div><div id="extensao" class="off">AGUARDANDO</div></div>
+  <div class="card"><div class="nome">PONTE MOBILE</div><div id="ponte" class="off">AGUARDANDO</div></div>
+  <div class="card"><div class="nome">SERVIDOR</div><div id="servidor" class="off">AGUARDANDO</div></div>
+ </div>
+ <div class="bloco"><div class="nome">CRUPIÊ / SINAIS / GREEN-RED / BANCA</div><div class="aviso">Ainda não enviados pela saída de leitura da v6.0.3. Nenhum dado fictício é mostrado.</div></div>
+ <div id="status" class="status off">● CONECTANDO</div>
+ <div id="rodape" class="rodape">Aguardando...</div>
 </div>
-
 <script>
-  const vermelhos = new Set([
-    1,3,5,7,9,12,14,16,18,
-    19,21,23,25,27,30,32,34,36
-  ]);
-
-  let historicoLocal = [];
-  let ultimoNumero = null;
-  let ultimoHorario = null;
-
-  function cor(numero) {
-    if (numero === 0) return "verde";
-    if (vermelhos.has(numero)) return "vermelho";
-    return "preto";
-  }
-
-  function adicionarHistorico(numero, horario) {
-    const chave = String(numero) + "|" + String(horario);
-
-    if (chave === ultimoHorario) return;
-
-    ultimoHorario = chave;
-
-    historicoLocal.unshift(numero);
-
-    if (historicoLocal.length > 15) {
-      historicoLocal = historicoLocal.slice(0, 15);
-    }
-
-    desenharHistorico();
-  }
-
-  function desenharHistorico() {
-    const area = document.getElementById("historico");
-    area.innerHTML = "";
-
-    historicoLocal.forEach(numero => {
-      const bola = document.createElement("div");
-      bola.className = "bola " + cor(numero);
-      bola.textContent = numero;
-      area.appendChild(bola);
-    });
-  }
-
-  async function atualizar() {
-    const resultado = document.getElementById("resultado");
-    const mobileStatus = document.getElementById("mobileStatus");
-    const syncStatus = document.getElementById("syncStatus");
-    const horario = document.getElementById("horario");
-
-    try {
-      const resposta = await fetch("/estado?t=" + Date.now(), {
-        cache: "no-store"
-      });
-
-      if (!resposta.ok) {
-        throw new Error("Servidor indisponível");
-      }
-
-      const dados = await resposta.json();
-
-      if (
-        dados.numero !== null &&
-        dados.numero !== undefined
-      ) {
-        const numero = Number(dados.numero);
-
-        if (
-          Number.isInteger(numero) &&
-          numero >= 0 &&
-          numero <= 36
-        ) {
-          resultado.textContent = numero;
-          resultado.className = "resultado " + cor(numero);
-
-          if (
-            numero !== ultimoNumero ||
-            dados.horario !== ultimoHorario
-          ) {
-            adicionarHistorico(numero, dados.horario);
-            ultimoNumero = numero;
-          }
-        }
-      }
-
-      if (dados.online) {
-        mobileStatus.textContent = "● SERVIDOR ONLINE";
-        mobileStatus.className = "status-mobile online";
-
-        syncStatus.textContent = "ONLINE";
-        syncStatus.className = "ok";
-      } else {
-        mobileStatus.textContent = "● ANALYZER OFFLINE";
-        mobileStatus.className = "status-mobile offline";
-
-        syncStatus.textContent = "OFFLINE";
-        syncStatus.className = "offline";
-      }
-
-      horario.textContent = dados.horario
-        ? "Último resultado recebido: " + dados.horario
-        : "Aguardando resultado...";
-
-    } catch (erro) {
-      mobileStatus.textContent = "● SEM CONEXÃO COM O SERVIDOR";
-      mobileStatus.className = "status-mobile offline";
-
-      syncStatus.textContent = "SEM CONEXÃO";
-      syncStatus.className = "offline";
-    }
-  }
-
-  atualizar();
-  setInterval(atualizar, 1000);
+const reds=new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
+function cor(n){return n===0?"verde":reds.has(n)?"vermelho":"preto"}
+function st(id,ok){const e=document.getElementById(id);e.textContent=ok?"OK":"AGUARDANDO";e.className=ok?"ok":"off"}
+async function atualizar(){
+ try{
+  const r=await fetch("/estado?t="+Date.now(),{cache:"no-store"});
+  if(!r.ok)throw new Error();
+  const d=await r.json(), n=Number(d.numero);
+  if(Number.isInteger(n)&&n>=0&&n<=36){const e=document.getElementById("resultado");e.textContent=n;e.className="resultado "+cor(n)}
+  const h=document.getElementById("historico");h.innerHTML="";
+  (Array.isArray(d.historico)?d.historico:[]).slice(0,30).forEach(x=>{const b=document.createElement("div");b.className="bola "+cor(Number(x));b.textContent=x;h.appendChild(b)});
+  st("leitor",!!d.diagnosticos?.leitor);st("extensao",!!d.diagnosticos?.extensao);st("ponte",!!d.diagnosticos?.ponte);st("servidor",true);
+  const s=document.getElementById("status");s.textContent=d.online?"● ANALYZER ONLINE":"● ANALYZER OFFLINE";s.className=d.online?"status ok":"status off";
+  document.getElementById("rodape").textContent=(d.horario?"Último giro: "+d.horario:"Aguardando resultado")+(d.seq!=null?" | seq "+d.seq:"");
+ }catch(e){st("servidor",false);const s=document.getElementById("status");s.textContent="● SEM CONEXÃO";s.className="status off"}
+}
+atualizar();setInterval(atualizar,1000);
 </script>
-
 </body>
 </html>
