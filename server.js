@@ -1,5 +1,5 @@
 const express=require("express");const app=express(),PORT=process.env.PORT||3000,OFF=20000;
-app.use(express.json({limit:"1mb"}));app.use(express.static(__dirname));
+app.use(express.json({limit:"1mb"}));app.use((q,r,n)=>{if(q.path==="/"||q.path==="/index.html")r.set("Cache-Control","no-store, no-cache, must-revalidate");n()});app.use(express.static(__dirname));
 let e={numero:null,seq:null,timestamp:null,horario:null,online:false,historico:[],diagnosticos:{leitor:false,extensao:false,ponte:false},mobile:null,recebidoEm:null};
 app.get("/health",(q,r)=>r.json({ok:true,service:"roulette-api",version:"0.2.1"}));
 app.get("/estado",(q,r)=>{r.set("Cache-Control","no-store");let a=e.recebidoEm&&Date.now()-e.recebidoEm<OFF;r.json({...e,online:Boolean(e.online&&a),diagnosticos:{...e.diagnosticos,ponte:Boolean(e.diagnosticos.ponte&&a)}})});
