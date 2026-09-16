@@ -22,7 +22,7 @@
 </head>
 <body>
 <div class="app">
- <div class="topo"><div class="titulo">ROULETTE ANALYZER <span class="versao">MOBILE</span></div><div class="subtitulo">Dados reais recebidos da v6.0.3</div></div>
+ <div class="topo"><div class="titulo">ROULETTE ANALYZER <span class="versao">MOBILE</span></div><div class="subtitulo">Dados reais recebidos do Roulette Analyzer</div></div>
  <div class="secao"><div class="label">ÚLTIMO RESULTADO</div><div id="resultado" class="resultado">--</div><div id="historico" class="historico"></div></div>
  <div class="grid">
   <div class="card"><div class="nome">LEITOR DA MESA</div><div id="leitor" class="off">AGUARDANDO</div></div>
@@ -50,10 +50,27 @@ async function atualizar(){
   const md=document.getElementById("mobileDados"),m=d.mobile;
   if(m&&typeof m==="object"){
    const dealer=m.dealer?.current; const active=m.signals?.active; const list=Array.isArray(m.signals?.list)?m.signals.list:[]; const f=m.finance||{};
-   const dealerNome=(dealer&&typeof dealer==="object")?(dealer.nome||dealer.name||"--"):(dealer||"--");
-   const activeArr=Array.isArray(active)?active:(active?[active]:[]);
-   const sinais=activeArr.length?activeArr:list.slice(0,3);
-   const sinalHtml=sinais.length?sinais.map(x=>{const o=(x&&typeof x==="object")?x:{nome:String(x)};const nome=o.nome||o.name||o.estrategia||o.strategy||"Sinal";const nums=o.numeros||o.numbers||o.alvos||o.targets;return `<div class="sinal ${activeArr.length?'ativo':''}"><b>${activeArr.length?'SINAL ATIVO':'SINAL'}</b>: ${nome}${Array.isArray(nums)&&nums.length?`<br>Números: ${nums.join(', ')}`:''}</div>`}).join(''):'<div class="linha">Sinais ativos: <span class="valor">nenhum</span></div>';
+   const dealerNome=(dealer&&typeof dealer==="object")?(dealer.dealer||dealer.nome||dealer.name||"--"):(dealer||"--");
+
+   // ra_v602_active é um objeto indexado pela chave da estratégia:
+   // { aba:{active:true,since:...}, zero:{...} }
+   // O nome/detalhe real fica em ra_v602_signals e é ligado pela mesma "key".
+   const activeEntries=(active&&typeof active==="object"&&!Array.isArray(active))
+     ? Object.entries(active).filter(([,v])=>v&&v.active===true)
+     : [];
+   const sinaisAtivos=activeEntries.map(([key,status])=>{
+     const ev=list.find(s=>s&&s.key===key) || {};
+     return {key,status,...ev};
+   });
+
+   const sinalHtml=sinaisAtivos.length
+     ? sinaisAtivos.map(o=>{
+         const nome=o.label||o.nome||o.name||o.estrategia||o.strategy||o.key||"Sinal";
+         const detalhe=o.detail||o.detalhe||"";
+         const nums=o.numeros||o.numbers||o.alvos||o.targets;
+         return `<div class="sinal ativo"><b>SINAL ATIVO</b>: ${nome}${detalhe?`<br>${detalhe}`:""}${Array.isArray(nums)&&nums.length?`<br>Números: ${nums.join(", ")}`:""}</div>`;
+       }).join("")
+     : '<div class="linha">Sinais ativos: <span class="valor">nenhum</span></div>';
    md.innerHTML=`<div class="linha">Crupiê: <span class="valor">${dealerNome}</span></div>${sinalHtml}<div class="linha">GREEN / RED: <span class="valor">${f.greens??0} / ${f.reds??0}</span></div><div class="linha">Banca: <span class="valor">${f.bankrollEstimated!=null?'R$ '+Number(f.bankrollEstimated).toFixed(2).replace('.',','):'--'}</span></div>`;
   }else md.textContent="Aguardando dados reais do Analyzer...";
   const s=document.getElementById("status");s.textContent=d.online?"● ANALYZER ONLINE":"● ANALYZER OFFLINE";s.className=d.online?"status ok":"status off";
