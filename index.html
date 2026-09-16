@@ -58,9 +58,16 @@ async function atualizar(){
    const activeEntries=(active&&typeof active==="object"&&!Array.isArray(active))
      ? Object.entries(active).filter(([,v])=>v&&v.active===true)
      : [];
+   const SIGNAL_NAMES={
+     aba:"A-B-A",
+     faixa:"13 a 18",
+     fixviz:"50+ sem vizinhos dos 13 a 18",
+     neighborAfterDealer:"Vizinhos após troca de crupiê",
+     zero:"Zero"
+   };
    const sinaisAtivos=activeEntries.map(([key,status])=>{
      const ev=list.find(s=>s&&s.key===key) || {};
-     return {key,status,...ev};
+     return {key,status,...ev,label:ev.label||SIGNAL_NAMES[key]||key};
    });
 
    const sinalHtml=sinaisAtivos.length
@@ -79,5 +86,5 @@ async function atualizar(){
 }
 atualizar();setInterval(atualizar,1000);
 </script>
-</body>
+<div style="text-align:center;font-size:11px;opacity:.55;margin:8px">MOBILE v0.6</div></body>
 </html>
