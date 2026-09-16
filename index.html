@@ -17,12 +17,12 @@
 .nome{color:#b8c2bd;font-size:11px}.ok{color:#18e69a;font-weight:bold;margin-top:3px}.off{color:#ff5967;font-weight:bold;margin-top:3px}
 .bloco{margin-top:10px;border:1px solid #315244;border-radius:10px;background:#081b14;padding:11px}
 .aviso{margin-top:7px;color:#8f9d97;font-size:12px}.status{text-align:center;margin-top:12px;padding:10px;border-radius:9px;border:1px solid #1a6046;background:#09271c;font-weight:bold}
-.rodape{text-align:center;color:#71817a;font-size:10px;padding:12px}
+.rodape{text-align:center;color:#71817a;font-size:10px;padding:12px}.linha{margin-top:7px;font-size:13px}.valor{font-weight:bold;color:#f5f5f5}.sinal{margin-top:8px;padding:8px;border:1px solid #315244;border-radius:8px}.sinal.ativo{border-color:#20e6a1;background:#09271c}
 </style>
 </head>
 <body>
 <div class="app">
- <div class="topo"><div class="titulo">ROULETTE ANALYZER <span class="versao">MOBILE</span></div><div class="subtitulo">Dados reais recebidos da v6.0.4</div></div>
+ <div class="topo"><div class="titulo">ROULETTE ANALYZER <span class="versao">MOBILE</span></div><div class="subtitulo">Dados reais recebidos da v6.0.3</div></div>
  <div class="secao"><div class="label">ÚLTIMO RESULTADO</div><div id="resultado" class="resultado">--</div><div id="historico" class="historico"></div></div>
  <div class="grid">
   <div class="card"><div class="nome">LEITOR DA MESA</div><div id="leitor" class="off">AGUARDANDO</div></div>
@@ -30,12 +30,7 @@
   <div class="card"><div class="nome">PONTE MOBILE</div><div id="ponte" class="off">AGUARDANDO</div></div>
   <div class="card"><div class="nome">SERVIDOR</div><div id="servidor" class="off">AGUARDANDO</div></div>
  </div>
- <div class="bloco"><div class="nome">CRUPIÊ ATUAL</div><div id="crupie" class="ok">AGUARDANDO</div></div>
- <div class="grid" style="margin-top:7px">
-  <div class="card"><div class="nome">GREEN / RED</div><div id="greenred" class="ok">0 / 0</div></div>
-  <div class="card"><div class="nome">BANCA ATUAL</div><div id="banca" class="ok">--</div></div>
- </div>
- <div class="bloco"><div class="nome">SINAIS</div><div id="sinais" class="aviso">Aguardando sinais reais...</div></div>
+ <div class="bloco"><div class="nome">CRUPIÊ / SINAIS / GREEN-RED / BANCA</div><div id="mobileDados" class="aviso">Aguardando dados reais do Analyzer...</div></div>
  <div id="status" class="status off">● CONECTANDO</div>
  <div id="rodape" class="rodape">Aguardando...</div>
 </div>
@@ -52,12 +47,15 @@ async function atualizar(){
   const h=document.getElementById("historico");h.innerHTML="";
   (Array.isArray(d.historico)?d.historico:[]).slice(0,30).forEach(x=>{const b=document.createElement("div");b.className="bola "+cor(Number(x));b.textContent=x;h.appendChild(b)});
   st("leitor",!!d.diagnosticos?.leitor);st("extensao",!!d.diagnosticos?.extensao);st("ponte",!!d.diagnosticos?.ponte);st("servidor",true);
-  const m=d.mobile||{}, dealer=m.dealer||{}, fin=m.finance||{}, sig=m.signals||{};
-  const dc=dealer.current; document.getElementById("crupie").textContent=(dc&&typeof dc==="object"?(dc.nome||dc.name||dc.dealer||"AGUARDANDO"):dc)||"AGUARDANDO";
-  document.getElementById("greenred").textContent=String(fin.greens??0)+" / "+String(fin.reds??0);
-  const bv=Number(fin.bankrollEstimated);document.getElementById("banca").textContent=Number.isFinite(bv)?bv.toLocaleString("pt-BR",{style:"currency",currency:"BRL"}):"--";
-  const ativos=Array.isArray(sig.active)?sig.active:(sig.active&&typeof sig.active==="object"?Object.values(sig.active):[]); const lista=ativos.length?ativos:(Array.isArray(sig.list)?sig.list:[]);
-  document.getElementById("sinais").textContent=lista.length?lista.slice(0,5).map(x=>typeof x==="string"?x:(x?.nome||x?.name||x?.strategy||"Sinal ativo")).join(" • "):"Nenhum sinal ativo";
+  const md=document.getElementById("mobileDados"),m=d.mobile;
+  if(m&&typeof m==="object"){
+   const dealer=m.dealer?.current; const active=m.signals?.active; const list=Array.isArray(m.signals?.list)?m.signals.list:[]; const f=m.finance||{};
+   const dealerNome=(dealer&&typeof dealer==="object")?(dealer.nome||dealer.name||"--"):(dealer||"--");
+   const activeArr=Array.isArray(active)?active:(active?[active]:[]);
+   const sinais=activeArr.length?activeArr:list.slice(0,3);
+   const sinalHtml=sinais.length?sinais.map(x=>{const o=(x&&typeof x==="object")?x:{nome:String(x)};const nome=o.nome||o.name||o.estrategia||o.strategy||"Sinal";const nums=o.numeros||o.numbers||o.alvos||o.targets;return `<div class="sinal ${activeArr.length?'ativo':''}"><b>${activeArr.length?'SINAL ATIVO':'SINAL'}</b>: ${nome}${Array.isArray(nums)&&nums.length?`<br>Números: ${nums.join(', ')}`:''}</div>`}).join(''):'<div class="linha">Sinais ativos: <span class="valor">nenhum</span></div>';
+   md.innerHTML=`<div class="linha">Crupiê: <span class="valor">${dealerNome}</span></div>${sinalHtml}<div class="linha">GREEN / RED: <span class="valor">${f.greens??0} / ${f.reds??0}</span></div><div class="linha">Banca: <span class="valor">${f.bankrollEstimated!=null?'R$ '+Number(f.bankrollEstimated).toFixed(2).replace('.',','):'--'}</span></div>`;
+  }else md.textContent="Aguardando dados reais do Analyzer...";
   const s=document.getElementById("status");s.textContent=d.online?"● ANALYZER ONLINE":"● ANALYZER OFFLINE";s.className=d.online?"status ok":"status off";
   document.getElementById("rodape").textContent=(d.horario?"Último giro: "+d.horario:"Aguardando resultado")+(d.seq!=null?" | seq "+d.seq:"");
  }catch(e){st("servidor",false);const s=document.getElementById("status");s.textContent="● SEM CONEXÃO";s.className="status off"}
